@@ -230,7 +230,14 @@
 
   <!-- TECH -->
   <div class="tab-content" id="tab-tech">
-    <div class="grid" id="news-tech-grid"></div>
+    <div style="font-family:var(--serif);font-size:15px;color:var(--ink-dim);margin-bottom:10px;">Startups &amp; Enterprise Tech</div>
+    <div class="grid" id="news-tech-general-grid"></div>
+    <div style="height:22px"></div>
+    <div style="font-family:var(--serif);font-size:15px;color:var(--ink-dim);margin-bottom:10px;">Artificial Intelligence</div>
+    <div class="grid" id="news-tech-ai-grid"></div>
+    <div style="height:22px"></div>
+    <div style="font-family:var(--serif);font-size:15px;color:var(--ink-dim);margin-bottom:10px;">Salesforce Ecosystem</div>
+    <div class="grid" id="news-tech-salesforce-grid"></div>
   </div>
 
   <!-- INDIA -->
@@ -407,11 +414,102 @@ async function loadSportsGroup(containerId, sportsList, includeCricket){
   container.appendChild(grid);
 }
 
+async function fetchGolfCard(){
+  const body = document.createElement('div');
+  try{
+    const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard');
+    if(!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    const events = data.events || [];
+    if(events.length === 0){
+      body.innerHTML = '<div class="empty">No PGA Tour event this week.</div>';
+      return {label:'PGA Tour (Golf)', body, live:false};
+    }
+    const ev = events[0];
+    const live = ev.status?.type?.state === 'in';
+    const competitors = (ev.competitions?.[0]?.competitors || []).slice(0, 10);
+    if(competitors.length === 0){
+      body.innerHTML = `<div class="empty">${ev.name || 'Tournament'} — leaderboard not posted yet.</div>`;
+    }else{
+      const nameLine = document.createElement('div');
+      nameLine.className = 'empty';
+      nameLine.style.marginBottom = '6px';
+      nameLine.textContent = ev.name || '';
+      body.appendChild(nameLine);
+      competitors.forEach(c=>{
+        const row = document.createElement('div');
+        row.className = 'row';
+        const pos = c.status?.position?.displayName || c.status?.position?.id || '';
+        const name = c.athlete?.displayName || 'Unknown';
+        const score = c.score?.displayValue ?? c.score ?? '';
+        row.innerHTML = `
+          <div class="who"><div class="team"><span>${pos ? pos + '. ' : ''}${name}</span></div></div>
+          <div class="score">${score}</div>
+        `;
+        body.appendChild(row);
+      });
+    }
+    return {label:'PGA Tour (Golf)', body, live};
+  }catch(e){
+    body.innerHTML = '<div class="err">Unavailable right now.</div>';
+    return {label:'PGA Tour (Golf)', body, live:false};
+  }
+}
+
+async function fetchTennisCard(){
+  const body = document.createElement('div');
+  try{
+    const [atpRes, wtaRes] = await Promise.all([
+      fetch('https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard'),
+      fetch('https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard'),
+    ]);
+    const atpData = atpRes.ok ? await atpRes.json() : {events:[]};
+    const wtaData = wtaRes.ok ? await wtaRes.json() : {events:[]};
+    const events = [...(atpData.events||[]), ...(wtaData.events||[])];
+    let live = false;
+    if(events.length === 0){
+      body.innerHTML = '<div class="empty">No ATP/WTA matches found today.</div>';
+    }else{
+      events.slice(0, 12).forEach(ev=>{
+        const comp = ev.competitions?.[0];
+        const players = comp?.competitors || [];
+        const p1 = players[0], p2 = players[1];
+        const state = ev.status?.type?.state;
+        if(state === 'in') live = true;
+        const row = document.createElement('div');
+        row.className = 'row';
+        row.innerHTML = `
+          <div class="who">
+            <div class="team"><span>${p1?.athlete?.displayName || p1?.athlete?.shortName || '?'}</span><span class="score">${p1?.score ?? ''}</span></div>
+            <div class="team"><span>${p2?.athlete?.displayName || p2?.athlete?.shortName || '?'}</span><span class="score">${p2?.score ?? ''}</span></div>
+          </div>
+          <div class="state ${state==='in'?'live':''}">${ev.status?.type?.shortDetail || ''}</div>
+        `;
+        body.appendChild(row);
+      });
+    }
+    return {label:'Tennis (ATP / WTA)', body, live};
+  }catch(e){
+    body.innerHTML = '<div class="err">Unavailable right now.</div>';
+    return {label:'Tennis (ATP / WTA)', body, live:false};
+  }
+}
+
+async function loadUSExtras(){
+  const grid = document.querySelector('#sports-us .grid');
+  if(!grid) return;
+  const [golf, tennis] = await Promise.all([fetchGolfCard(), fetchTennisCard()]);
+  [golf, tennis].forEach(r=>{
+    grid.appendChild(makeCard(r.label, r.body, {live:r.live}));
+  });
+}
+
 async function loadSports(){
   await Promise.all([
     loadSportsGroup('sports-us', SPORTS_US, false),
     loadSportsGroup('sports-world', SPORTS_WORLD, true),
   ]);
+  await loadUSExtras();
 }
 
 // ---------- MARKETS ----------
@@ -515,15 +613,29 @@ const NEWS_CATEGORIES = {
     {label:'NYT Health', url:'https://rss.nytimes.com/services/xml/rss/nyt/Health.xml'},
     {label:'BBC Health', url:'http://feeds.bbci.co.uk/news/health/rss.xml'},
   ],
-  tech: [
-    {label:'Ars Technica', url:'http://feeds.arstechnica.com/arstechnica/index'},
-    {label:'BBC Technology', url:'http://feeds.bbci.co.uk/news/technology/rss.xml'},
-  ],
   india: [
     {label:'Top Stories (India)', url:'https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en'},
     {label:'Business (India)', url:'https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=en-IN&gl=IN&ceid=IN:en'},
     {label:'Politics (India)', url:'https://news.google.com/rss/headlines/section/topic/NATION?hl=en-IN&gl=IN&ceid=IN:en'},
     {label:'Telangana', url:'https://news.google.com/rss/search?q=Telangana&hl=en-IN&gl=IN&ceid=IN:en'},
+  ],
+};
+
+const TECH_GROUPS = {
+  'tech-general': [
+    {label:'TechCrunch', url:'https://techcrunch.com/feed/'},
+    {label:'VentureBeat', url:'https://venturebeat.com/feed/'},
+    {label:'The Verge', url:'https://www.theverge.com/rss/index.xml'},
+    {label:'Ars Technica', url:'http://feeds.arstechnica.com/arstechnica/index'},
+  ],
+  'tech-ai': [
+    {label:'TechCrunch — AI', url:'https://techcrunch.com/category/artificial-intelligence/feed/'},
+    {label:'VentureBeat — AI', url:'https://venturebeat.com/category/ai/feed/'},
+    {label:'AI (broad search)', url:'https://news.google.com/rss/search?q=artificial%20intelligence&hl=en-US&gl=US&ceid=US:en'},
+  ],
+  'tech-salesforce': [
+    {label:'Salesforce Ben', url:'https://www.salesforceben.com/feed/'},
+    {label:'Salesforce (broad search)', url:'https://news.google.com/rss/search?q=Salesforce&hl=en-US&gl=US&ceid=US:en'},
   ],
 };
 
@@ -558,10 +670,9 @@ function buildFeedBody(r){
   return body;
 }
 
-async function loadNewsCategory(catKey){
-  const feeds = NEWS_CATEGORIES[catKey];
+async function loadFeedGroup(gridId, feeds){
   const results = await Promise.all(feeds.map(fetchFeed));
-  const grid = document.getElementById(`news-${catKey}-grid`);
+  const grid = document.getElementById(gridId);
   grid.innerHTML = '';
   results.forEach(r=>{
     grid.appendChild(makeCard(r.label, buildFeedBody(r), {}));
@@ -569,7 +680,8 @@ async function loadNewsCategory(catKey){
 }
 
 function loadAllNews(){
-  Object.keys(NEWS_CATEGORIES).forEach(loadNewsCategory);
+  Object.keys(NEWS_CATEGORIES).forEach(key => loadFeedGroup(`news-${key}-grid`, NEWS_CATEGORIES[key]));
+  Object.keys(TECH_GROUPS).forEach(key => loadFeedGroup(`news-${key}-grid`, TECH_GROUPS[key]));
 }
 
 // ---------- SPORTS CALENDAR (static reference data, verified Sept 2026) ----------
