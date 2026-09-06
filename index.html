@@ -4,58 +4,69 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Morning Briefing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;1,6..72,500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#12151c;
-    --panel:#181c26;
-    --line:#2a3040;
-    --ink:#e8e9ec;
-    --ink-dim:#8b93a3;
+    --bg:#0f1218;
+    --panel:#161b24;
+    --line:#262d3b;
+    --ink:#e9eaee;
+    --ink-dim:#828b9c;
     --gold:#d9a441;
     --up:#4c9a8c;
     --down:#c1544c;
+    --serif:'Newsreader', Georgia, serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","IBM Plex Mono",Consolas,monospace;
   }
   *{box-sizing:border-box;}
   body{
     margin:0;
     background:var(--bg);
     color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    font-family:var(--sans);
     font-size:14px;
   }
+
   header{
     display:flex;
     justify-content:space-between;
-    align-items:baseline;
-    padding:20px 24px 12px;
-    border-bottom:1px solid var(--line);
+    align-items:flex-end;
+    padding:26px 32px 16px;
+    border-bottom:1px solid var(--gold);
   }
   header h1{
-    font-size:19px;
+    font-family:var(--serif);
     font-weight:600;
+    font-size:26px;
     margin:0;
     letter-spacing:.2px;
   }
   header .clock{
-    font-family:ui-monospace,"SF Mono","IBM Plex Mono",Consolas,monospace;
+    font-family:var(--mono);
     color:var(--ink-dim);
     font-size:13px;
+    padding-bottom:4px;
   }
 
   nav.tabs{
     display:flex;
-    gap:2px;
-    padding:0 24px;
+    gap:4px;
+    padding:0 32px;
     border-bottom:1px solid var(--line);
     overflow-x:auto;
+    background:var(--bg);
   }
   nav.tabs button{
     background:none;
     border:none;
     color:var(--ink-dim);
+    font-family:var(--sans);
     font-size:13px;
     font-weight:500;
-    padding:14px 14px 12px;
+    padding:13px 14px 11px;
     cursor:pointer;
     border-bottom:2px solid transparent;
     white-space:nowrap;
@@ -66,93 +77,96 @@
     border-bottom:2px solid var(--gold);
   }
 
-  main{max-width:900px; margin:0 auto; padding:20px 24px 40px;}
+  main{max-width:1320px; margin:0 auto; padding:28px 32px 48px;}
   .tab-content{display:none;}
   .tab-content.active{display:block;}
 
-  .subtoggle{
-    display:flex; gap:8px; margin-bottom:16px;
-  }
+  .subtoggle{display:flex; gap:8px; margin-bottom:20px;}
   .subtoggle button{
     background:var(--panel);
     border:1px solid var(--line);
     color:var(--ink-dim);
     font-size:12px;
-    padding:6px 12px;
+    padding:6px 14px;
     cursor:pointer;
   }
-  .subtoggle button.active{
-    color:var(--gold);
-    border-color:var(--gold);
-  }
+  .subtoggle button.active{color:var(--gold); border-color:var(--gold);}
   .sub-content{display:none;}
   .sub-content.active{display:block;}
 
-  .panel{
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
+    gap:18px;
+    align-items:start;
+  }
+
+  .card{
     background:var(--panel);
     border:1px solid var(--line);
-    padding:16px 18px;
-    margin-bottom:16px;
+    border-top:2px solid var(--line);
+    padding:16px 18px 18px;
   }
-  .panel-head{
-    display:flex; justify-content:space-between; align-items:center;
-    margin-bottom:8px;
+  .card.has-live{border-top:2px solid var(--up);}
+  .card-head{
+    display:flex; justify-content:space-between; align-items:baseline;
+    margin-bottom:10px; gap:10px;
   }
-  .panel-head h2{
-    font-size:11px; font-weight:600; text-transform:uppercase;
-    letter-spacing:.6px; color:var(--gold); margin:0;
+  .card-head h3{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:16px;
+    margin:0;
+    color:var(--ink);
   }
-  .updated{
-    font-size:11px; color:var(--ink-dim);
-    font-family:ui-monospace,"SF Mono","IBM Plex Mono",Consolas,monospace;
+  .card-updated{
+    font-size:10px; color:var(--ink-dim); font-family:var(--mono); white-space:nowrap;
   }
-  .block-label{
-    font-size:11px; color:var(--ink-dim); margin:14px 0 6px;
-    padding-top:10px; border-top:1px solid var(--line);
-  }
-  .block-label:first-child{border-top:none; padding-top:0; margin-top:0;}
+
   .row{
     display:flex; justify-content:space-between; align-items:center;
-    padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.04); gap:10px;
+    padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.05); gap:10px;
   }
   .row:last-child{border-bottom:none;}
   .row .who{flex:1; min-width:0;}
   .row .team{
     display:flex; justify-content:space-between; gap:8px;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    font-size:14px;
   }
-  .row .score{
-    font-family:ui-monospace,"SF Mono","IBM Plex Mono",Consolas,monospace;
-    font-weight:600;
-  }
+  .row .score{font-family:var(--mono); font-weight:600;}
   .row .state{
-    font-size:11px; color:var(--ink-dim); min-width:64px; text-align:right;
-    font-family:ui-monospace,"SF Mono","IBM Plex Mono",Consolas,monospace;
+    font-size:11px; color:var(--ink-dim); min-width:64px; text-align:right; font-family:var(--mono);
   }
-  .row .state.live{color:var(--up);}
+  .row .state.live{color:var(--up); font-weight:600;}
+  .price-row .delta.up{color:var(--up);}
+  .price-row .delta.down{color:var(--down);}
+
+  .news-item{
+    display:block; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.05);
+    color:var(--ink); text-decoration:none;
+  }
+  .news-item:last-child{border-bottom:none;}
+  .news-item .headline{font-size:14.5px; line-height:1.4; font-weight:500;}
+  .news-item:hover .headline{color:var(--gold);}
+  .news-item .src{display:block; font-size:11px; color:var(--ink-dim); margin-top:3px;}
+
+  .empty, .err{color:var(--ink-dim); font-size:12px; padding:6px 0;}
+  .err{color:var(--down);}
+
   .cal-badge{
     font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.4px;
-    padding:2px 7px; border:1px solid var(--line); white-space:nowrap;
+    padding:2px 7px; border:1px solid var(--line); white-space:nowrap; flex-shrink:0;
   }
   .cal-badge.live{color:var(--up); border-color:var(--up);}
   .cal-badge.upcoming{color:var(--ink-dim); border-color:var(--line);}
   .cal-badge.ended{color:var(--ink-dim); border-color:var(--line); opacity:.5;}
-  .cal-dates{font-size:11px; color:var(--ink-dim); font-family:ui-monospace,"SF Mono","IBM Plex Mono",Consolas,monospace;}
-  .cal-note{font-size:11px; color:var(--ink-dim); margin-top:2px;}
-  .price-row .delta.up{color:var(--up);}
-  .price-row .delta.down{color:var(--down);}
-  .news-item{
-    display:block; padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.04);
-    color:var(--ink); text-decoration:none; font-size:13px; line-height:1.35;
-  }
-  .news-item:hover{color:var(--gold);}
-  .news-item .src{display:block; font-size:10px; color:var(--ink-dim); margin-top:2px;}
-  .empty, .err{color:var(--ink-dim); font-size:12px; padding:6px 0;}
-  .err{color:var(--down);}
+  .cal-dates{font-size:11px; color:var(--ink-dim); font-family:var(--mono); margin-top:2px;}
+  .cal-note{font-size:11px; color:var(--ink-dim); margin-top:3px; line-height:1.4;}
 
   footer{
-    padding:16px 24px 28px; color:var(--ink-dim); font-size:11px;
-    line-height:1.6; border-top:1px solid var(--line);
+    padding:20px 32px 32px; color:var(--ink-dim); font-size:11px;
+    line-height:1.7; border-top:1px solid var(--line); max-width:1320px; margin:0 auto;
   }
   footer a{color:var(--gold);}
 </style>
@@ -183,63 +197,45 @@
       <button data-sub="us" class="active">USA</button>
       <button data-sub="world">International</button>
     </div>
-    <div class="panel">
-      <div class="panel-head"><h2 id="sports-h2">Today — USA</h2><span class="updated" id="sports-updated">loading…</span></div>
-      <div class="sub-content active" id="sports-us"><div class="empty">Loading…</div></div>
-      <div class="sub-content" id="sports-world"><div class="empty">Loading…</div></div>
-    </div>
+    <div class="sub-content active" id="sports-us"><div class="empty">Loading…</div></div>
+    <div class="sub-content" id="sports-world"><div class="empty">Loading…</div></div>
   </div>
 
   <!-- BUSINESS -->
   <div class="tab-content" id="tab-business">
-    <div class="panel">
-      <div class="panel-head"><h2>Markets</h2><span class="updated" id="markets-updated">loading…</span></div>
-      <div id="markets-body"><div class="empty">Loading prices…</div></div>
+    <div class="grid" id="business-grid">
+      <div class="card" id="card-markets">
+        <div class="card-head"><h3>Markets</h3><span class="card-updated" id="markets-updated">loading…</span></div>
+        <div id="markets-body"><div class="empty">Loading prices…</div></div>
+      </div>
     </div>
-    <div class="panel">
-      <div class="panel-head"><h2>Business Headlines</h2><span class="updated" id="news-business-updated">loading…</span></div>
-      <div id="news-business-body"><div class="empty">Loading…</div></div>
-    </div>
+    <div style="height:18px"></div>
+    <div class="grid" id="news-business-grid"></div>
   </div>
 
   <!-- POLITICS -->
   <div class="tab-content" id="tab-politics">
-    <div class="panel">
-      <div class="panel-head"><h2>Politics</h2><span class="updated" id="news-politics-updated">loading…</span></div>
-      <div id="news-politics-body"><div class="empty">Loading…</div></div>
-    </div>
+    <div class="grid" id="news-politics-grid"></div>
   </div>
 
   <!-- WORLD AFFAIRS -->
   <div class="tab-content" id="tab-world">
-    <div class="panel">
-      <div class="panel-head"><h2>World Affairs</h2><span class="updated" id="news-world-updated">loading…</span></div>
-      <div id="news-world-body"><div class="empty">Loading…</div></div>
-    </div>
+    <div class="grid" id="news-world-grid"></div>
   </div>
 
   <!-- HEALTH -->
   <div class="tab-content" id="tab-health">
-    <div class="panel">
-      <div class="panel-head"><h2>Health Care</h2><span class="updated" id="news-health-updated">loading…</span></div>
-      <div id="news-health-body"><div class="empty">Loading…</div></div>
-    </div>
+    <div class="grid" id="news-health-grid"></div>
   </div>
 
   <!-- TECH -->
   <div class="tab-content" id="tab-tech">
-    <div class="panel">
-      <div class="panel-head"><h2>Technology</h2><span class="updated" id="news-tech-updated">loading…</span></div>
-      <div id="news-tech-body"><div class="empty">Loading…</div></div>
-    </div>
+    <div class="grid" id="news-tech-grid"></div>
   </div>
 
   <!-- INDIA -->
   <div class="tab-content" id="tab-india">
-    <div class="panel">
-      <div class="panel-head"><h2>India</h2><span class="updated" id="news-india-updated">loading…</span></div>
-      <div id="news-india-body"><div class="empty">Loading…</div></div>
-    </div>
+    <div class="grid" id="news-india-grid"></div>
   </div>
 
   <!-- SPORTS CALENDAR -->
@@ -248,11 +244,8 @@
       <button data-sub="us" class="active">USA</button>
       <button data-sub="world">International</button>
     </div>
-    <div class="panel">
-      <div class="panel-head"><h2 id="calendar-h2">Season Calendar — USA</h2><span class="updated" id="calendar-updated"></span></div>
-      <div class="sub-content active" id="calendar-us"></div>
-      <div class="sub-content" id="calendar-world"></div>
-    </div>
+    <div class="sub-content active" id="calendar-us"></div>
+    <div class="sub-content" id="calendar-world"></div>
   </div>
 
 </main>
@@ -261,14 +254,12 @@
   Sports: ESPN's public scoreboard endpoints (no key), refreshed every 45s. Cricket (Test/IPL) links out to ESPNcricinfo — ESPN's cricket API needs a live series ID rather than a fixed slug.
   Markets: CoinGecko for crypto (no key, ~30s). US indices (S&P 500 / Nasdaq 100 / Dow 30) shown via SPY/QQQ/DIA proxies through Alpaca's Market Data API (IEX feed), authenticated with a paper-trading account key — no real funds are reachable through this key even if exposed.
   News: RSS via rss2json's public endpoint (10-min refresh), which rate-limits unauthenticated traffic — get a free key at rss2json.com and paste it into RSS2JSON_KEY below for reliable refreshes.
-  India tab: no single regional outlet publishes a reliable, stable RSS feed for Telangana specifically, so this uses Google News' topic and keyword-search RSS (India edition) instead — "Telangana" is a live search across all indexed outlets, not one publication.
+  India tab: no single regional outlet publishes a reliable, stable RSS feed for Telangana specifically, so this uses Google News' topic and keyword-search RSS (India edition) instead — bylines are parsed out of each headline's "– Publisher" suffix.
   Sports Calendar: static reference data (season start/end dates), not a live feed — verified as of Sept 2026. A couple of dates (Champions League final, La Liga end date, The Open Championship) had conflicting or unconfirmed reporting at write time and are flagged inline. Refresh this list yourself as seasons roll over.
 </footer>
 
 <script>
 const RSS2JSON_KEY = ""; // optional: paste a free key from rss2json.com here for higher rate limits
-
-// Alpaca Paper-Only account keys — market data only, no trading, no real funds at risk.
 const ALPACA_KEY_ID = "PKW5P5SPUJJZVXI5YDQYWJC7JS";
 const ALPACA_SECRET = "CZTsLJhfsRAB6rpBemK1mWmUbYdNLJssKJ5F5FbaogzX";
 
@@ -277,7 +268,29 @@ function fmtTime(){
   return d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
 }
 setInterval(()=>{ document.getElementById('clock').textContent = fmtTime(); }, 1000);
-function setUpdated(id){ document.getElementById(id).textContent = fmtTime(); }
+
+function makeCard(title, bodyEl, opts={}){
+  const card = document.createElement('div');
+  card.className = 'card' + (opts.live ? ' has-live' : '');
+  const head = document.createElement('div');
+  head.className = 'card-head';
+  head.innerHTML = `<h3>${title}</h3><span class="card-updated">${fmtTime()}</span>`;
+  card.appendChild(head);
+  card.appendChild(bodyEl);
+  return card;
+}
+
+// Splits Google News-style "Headline – Publisher" into parts; falls back cleanly otherwise.
+function parseHeadline(title, fallbackSource){
+  const idx = title.lastIndexOf(' - ');
+  if(idx > 10){
+    const tail = title.slice(idx + 3).trim();
+    if(tail.length > 0 && tail.length < 40){
+      return {headline: title.slice(0, idx).trim(), source: tail};
+    }
+  }
+  return {headline: title, source: fallbackSource};
+}
 
 // ---------- TAB / TOGGLE WIRING ----------
 document.getElementById('tabs').addEventListener('click', (e)=>{
@@ -296,7 +309,6 @@ document.getElementById('sports-subtoggle').addEventListener('click', (e)=>{
   document.querySelectorAll('#tab-sports .sub-content').forEach(c=>c.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('sports-' + btn.dataset.sub).classList.add('active');
-  document.getElementById('sports-h2').textContent = 'Today — ' + (btn.dataset.sub === 'us' ? 'USA' : 'International');
 });
 
 document.getElementById('calendar-subtoggle').addEventListener('click', (e)=>{
@@ -306,70 +318,7 @@ document.getElementById('calendar-subtoggle').addEventListener('click', (e)=>{
   document.querySelectorAll('#tab-calendar .sub-content').forEach(c=>c.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('calendar-' + btn.dataset.sub).classList.add('active');
-  document.getElementById('calendar-h2').textContent = 'Season Calendar — ' + (btn.dataset.sub === 'us' ? 'USA' : 'International');
 });
-
-// ---------- SPORTS CALENDAR (static reference data, verified as of Sept 2026) ----------
-// Dates are ISO (YYYY-MM-DD). One-off global events (Olympics, World Cup) list their
-// actual 2026 dates even if already past, since this is a whole-year reference.
-const CALENDAR_US = [
-  {name:'NFL', start:'2026-09-09', end:'2027-02-14', note:'Super Bowl LXI: Feb 14, 2027 (SoFi Stadium)'},
-  {name:'NBA', start:'2026-10-20', end:'2027-06-20', note:'Regular season ends Apr 11, 2027; Finals in June 2027'},
-  {name:'MLB', start:'2026-03-25', end:'2026-10-31', note:'Regular season ends Sep 27; World Series Oct 23\u201331'},
-  {name:'NHL', start:'2026-09-29', end:'2027-06-20', note:'Regular season ends Apr 10, 2027; Cup awarded mid-June 2027'},
-  {name:'MLS', start:'2026-02-21', end:'2026-12-18', note:'Paused May 25\u2013Jul 16 for the World Cup; MLS Cup Dec 18'},
-  {name:'The Masters (golf)', start:'2026-04-09', end:'2026-04-12', note:'Augusta National'},
-  {name:'PGA Championship (golf)', start:'2026-05-14', end:'2026-05-17', note:'Aronimink GC'},
-  {name:'U.S. Open (golf)', start:'2026-06-18', end:'2026-06-21', note:'Shinnecock Hills'},
-];
-const CALENDAR_WORLD = [
-  {name:'Premier League', start:'2026-08-22', end:'2027-05-30', note:'England'},
-  {name:'Champions League', start:'2026-08-27', end:'2027-06-05', note:'Final date reported as either May 22 or Jun 5, 2027 depending on source \u2014 unconfirmed'},
-  {name:'La Liga', start:'2026-08-15', end:'2027-05-30', note:'Spain; end date not yet fully confirmed'},
-  {name:'IPL (cricket)', start:'2026-03-28', end:'2026-05-31', note:'Next edition typically runs Mar\u2013May annually'},
-  {name:'Australian Open (tennis)', start:'2026-01-18', end:'2026-02-01', note:''},
-  {name:'French Open (tennis)', start:'2026-05-24', end:'2026-06-07', note:'Roland Garros'},
-  {name:'Wimbledon (tennis)', start:'2026-06-29', end:'2026-07-12', note:''},
-  {name:'US Open (tennis)', start:'2026-08-31', end:'2026-09-13', note:''},
-  {name:'The Open Championship (golf)', start:'2026-07-16', end:'2026-07-19', note:'Royal Birkdale \u2014 exact dates approximate, unconfirmed'},
-  {name:'Formula 1', start:'2026-03-06', end:'2026-12-06', note:'Melbourne \u2192 Abu Dhabi, 24 races'},
-  {name:'FIFA World Cup', start:'2026-06-11', end:'2026-07-19', note:'USA / Canada / Mexico \u2014 next edition 2030'},
-  {name:'Winter Olympics', start:'2026-02-06', end:'2026-02-22', note:'Milano Cortina \u2014 next Winter Games 2030'},
-];
-
-function calStatus(start, end){
-  const now = new Date();
-  const s = new Date(start + 'T00:00:00');
-  const e = new Date(end + 'T23:59:59');
-  if(now >= s && now <= e) return 'live';
-  if(now < s) return 'upcoming';
-  return 'ended';
-}
-
-function renderCalendarGroup(container, data){
-  container.innerHTML = '';
-  data.forEach(item=>{
-    const status = calStatus(item.start, item.end);
-    const badgeText = status === 'live' ? 'In season' : (status === 'upcoming' ? 'Upcoming' : 'Ended');
-    const row = document.createElement('div');
-    row.className = 'row';
-    row.innerHTML = `
-      <div class="who">
-        <div class="team"><span>${item.name}</span></div>
-        <div class="cal-dates">${item.start} \u2192 ${item.end}</div>
-        ${item.note ? `<div class="cal-note">${item.note}</div>` : ''}
-      </div>
-      <div class="cal-badge ${status}">${badgeText}</div>
-    `;
-    container.appendChild(row);
-  });
-}
-
-function renderCalendar(){
-  renderCalendarGroup(document.getElementById('calendar-us'), CALENDAR_US);
-  renderCalendarGroup(document.getElementById('calendar-world'), CALENDAR_WORLD);
-  document.getElementById('calendar-updated').textContent = 'reference data';
-}
 
 // ---------- SPORTS ----------
 const SPORTS_US = [
@@ -392,21 +341,19 @@ async function fetchSport(sport){
     if(!res.ok) throw new Error(res.status);
     const data = await res.json();
     const events = (data.events || []);
-    if(events.length === 0) return {label: sport.label, rows: []};
     const rows = events.map(ev => {
       const comp = ev.competitions?.[0];
       const competitors = comp?.competitors || [];
       const home = competitors.find(c=>c.homeAway==='home');
       const away = competitors.find(c=>c.homeAway==='away');
       const state = ev.status?.type?.state;
-      const shortDetail = ev.status?.type?.shortDetail || '';
       return {
         home: home?.team?.displayName || home?.team?.shortDisplayName || home?.team?.abbreviation || '?',
         away: away?.team?.displayName || away?.team?.shortDisplayName || away?.team?.abbreviation || '?',
         homeScore: home?.score ?? '',
         awayScore: away?.score ?? '',
         live: state === 'in',
-        detail: shortDetail
+        detail: ev.status?.type?.shortDetail || ''
       };
     });
     return {label: sport.label, rows};
@@ -415,65 +362,61 @@ async function fetchSport(sport){
   }
 }
 
-function renderSportGroup(container, results, isWorld){
-  container.innerHTML = '';
-  let anyGames = false;
-  results.forEach(r=>{
-    if(r.rows === null || r.rows.length === 0) return;
-    anyGames = true;
-    const label = document.createElement('div');
-    label.className = 'block-label';
-    label.textContent = r.label;
-    container.appendChild(label);
-    r.rows.forEach(g=>{
-      const row = document.createElement('div');
-      row.className = 'row';
-      row.innerHTML = `
-        <div class="who">
-          <div class="team"><span>${g.away}</span><span class="score">${g.awayScore}</span></div>
-          <div class="team"><span>${g.home}</span><span class="score">${g.homeScore}</span></div>
-        </div>
-        <div class="state ${g.live ? 'live' : ''}">${g.detail}</div>
-      `;
-      container.appendChild(row);
-    });
+function buildSportBody(rows){
+  const body = document.createElement('div');
+  if(rows === null){
+    body.innerHTML = '<div class="err">Unavailable right now.</div>';
+    return {body, live:false};
+  }
+  if(rows.length === 0){
+    body.innerHTML = '<div class="empty">No games today.</div>';
+    return {body, live:false};
+  }
+  let live = false;
+  rows.forEach(g=>{
+    if(g.live) live = true;
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `
+      <div class="who">
+        <div class="team"><span>${g.away}</span><span class="score">${g.awayScore}</span></div>
+        <div class="team"><span>${g.home}</span><span class="score">${g.homeScore}</span></div>
+      </div>
+      <div class="state ${g.live ? 'live' : ''}">${g.detail}</div>
+    `;
+    body.appendChild(row);
   });
-  if(isWorld){
-    const cricketLabel = document.createElement('div');
-    cricketLabel.className = 'block-label';
-    cricketLabel.textContent = 'Cricket (Test / IPL)';
-    container.appendChild(cricketLabel);
-    const cricketLink = document.createElement('a');
-    cricketLink.href = 'https://www.espncricinfo.com/live-cricket-score';
-    cricketLink.target = '_blank';
-    cricketLink.className = 'news-item';
-    cricketLink.textContent = 'Open live cricket scores on ESPNcricinfo →';
-    container.appendChild(cricketLink);
+  return {body, live};
+}
+
+async function loadSportsGroup(containerId, sportsList, includeCricket){
+  const results = await Promise.all(sportsList.map(fetchSport));
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'grid';
+  results.forEach(r=>{
+    const {body, live} = buildSportBody(r.rows);
+    grid.appendChild(makeCard(r.label, body, {live}));
+  });
+  if(includeCricket){
+    const cricketBody = document.createElement('div');
+    cricketBody.innerHTML = `<a href="https://www.espncricinfo.com/live-cricket-score" target="_blank" class="news-item"><span class="headline">Open live cricket scores on ESPNcricinfo →</span></a>`;
+    grid.appendChild(makeCard('Cricket (Test / IPL)', cricketBody, {}));
   }
-  if(!anyGames){
-    const e = document.createElement('div');
-    e.className = 'empty';
-    e.textContent = 'No games found today.';
-    container.prepend(e);
-  }
+  container.appendChild(grid);
 }
 
 async function loadSports(){
-  const [usResults, worldResults] = await Promise.all([
-    Promise.all(SPORTS_US.map(fetchSport)),
-    Promise.all(SPORTS_WORLD.map(fetchSport)),
+  await Promise.all([
+    loadSportsGroup('sports-us', SPORTS_US, false),
+    loadSportsGroup('sports-world', SPORTS_WORLD, true),
   ]);
-  renderSportGroup(document.getElementById('sports-us'), usResults, false);
-  renderSportGroup(document.getElementById('sports-world'), worldResults, true);
-  setUpdated('sports-updated');
 }
 
 // ---------- MARKETS ----------
-async function loadCrypto(container){
-  const label = document.createElement('div');
-  label.className = 'block-label';
-  label.textContent = 'Crypto (live)';
-  container.appendChild(label);
+async function loadCrypto(){
+  const body = document.createElement('div');
   try{
     const ids = 'bitcoin,ethereum,solana';
     const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`;
@@ -493,30 +436,25 @@ async function loadCrypto(container){
         <div class="score">$${price.toLocaleString(undefined,{maximumFractionDigits:2})}</div>
         <div class="delta ${up?'up':'down'}" style="min-width:60px;text-align:right;">${up?'+':''}${chg.toFixed(2)}%</div>
       `;
-      container.appendChild(row);
+      body.appendChild(row);
     });
   }catch(e){
-    container.innerHTML += '<div class="err">Crypto prices unavailable right now.</div>';
+    body.innerHTML = '<div class="err">Crypto prices unavailable right now.</div>';
   }
+  return body;
 }
 
-async function loadEquities(container){
-  const label = document.createElement('div');
-  label.className = 'block-label';
-  label.textContent = 'US Indices (via ETF proxy, live)';
-  container.appendChild(label);
+async function loadEquities(){
+  const body = document.createElement('div');
   if(!ALPACA_KEY_ID || !ALPACA_SECRET){
-    container.innerHTML += '<div class="empty">Add an Alpaca paper-account key to ALPACA_KEY_ID / ALPACA_SECRET.</div>';
-    return;
+    body.innerHTML = '<div class="empty">Add an Alpaca paper-account key to ALPACA_KEY_ID / ALPACA_SECRET.</div>';
+    return body;
   }
   const symbols = {SPY:'S&P 500', QQQ:'Nasdaq 100', DIA:'Dow 30'};
   try{
     const url = `https://data.alpaca.markets/v2/stocks/snapshots?symbols=${Object.keys(symbols).join(',')}&feed=iex`;
     const res = await fetch(url, {
-      headers: {
-        'APCA-API-KEY-ID': ALPACA_KEY_ID,
-        'APCA-API-SECRET-KEY': ALPACA_SECRET
-      }
+      headers: {'APCA-API-KEY-ID': ALPACA_KEY_ID, 'APCA-API-SECRET-KEY': ALPACA_SECRET}
     });
     if(!res.ok) throw new Error(res.status);
     const data = await res.json();
@@ -534,21 +472,32 @@ async function loadEquities(container){
         <div class="score">$${price.toLocaleString(undefined,{maximumFractionDigits:2})}</div>
         <div class="delta ${up?'up':'down'}" style="min-width:60px;text-align:right;">${up?'+':''}${chg.toFixed(2)}%</div>
       `;
-      container.appendChild(row);
+      body.appendChild(row);
     });
   }catch(e){
-    container.innerHTML += '<div class="err">Equity data unavailable (check API key / rate limit).</div>';
+    body.innerHTML += '<div class="err">Equity data unavailable (check API key / rate limit).</div>';
   }
+  return body;
 }
 
 async function loadMarkets(){
-  const body = document.getElementById('markets-body');
-  body.innerHTML = '';
-  await Promise.all([loadEquities(body), loadCrypto(body)]);
-  setUpdated('markets-updated');
+  const [equities, crypto] = await Promise.all([loadEquities(), loadCrypto()]);
+  const combined = document.createElement('div');
+  const eqLabel = document.createElement('div');
+  eqLabel.style.cssText = 'font-size:11px;color:var(--ink-dim);margin-bottom:6px;';
+  eqLabel.textContent = 'US Indices (ETF proxy)';
+  combined.appendChild(eqLabel);
+  combined.appendChild(equities);
+  const cryptoLabel = document.createElement('div');
+  cryptoLabel.style.cssText = 'font-size:11px;color:var(--ink-dim);margin:14px 0 6px;padding-top:10px;border-top:1px solid var(--line);';
+  cryptoLabel.textContent = 'Crypto';
+  combined.appendChild(cryptoLabel);
+  combined.appendChild(crypto);
+  document.getElementById('markets-body').replaceWith(Object.assign(combined, {id:'markets-body'}));
+  document.getElementById('markets-updated').textContent = fmtTime();
 }
 
-// ---------- NEWS (per category) ----------
+// ---------- NEWS ----------
 const NEWS_CATEGORIES = {
   business: [
     {label:'BBC Business', url:'http://feeds.bbci.co.uk/news/business/rss.xml'},
@@ -591,46 +540,105 @@ async function fetchFeed(feed){
   }
 }
 
+function buildFeedBody(r){
+  const body = document.createElement('div');
+  if(r.items === null){
+    body.innerHTML = '<div class="err">Unavailable right now (rate-limited or down).</div>';
+    return body;
+  }
+  r.items.forEach(item=>{
+    const {headline, source} = parseHeadline(item.title, r.label);
+    const a = document.createElement('a');
+    a.className = 'news-item';
+    a.href = item.link;
+    a.target = '_blank';
+    a.innerHTML = `<span class="headline">${headline}</span><span class="src">${source}</span>`;
+    body.appendChild(a);
+  });
+  return body;
+}
+
 async function loadNewsCategory(catKey){
   const feeds = NEWS_CATEGORIES[catKey];
   const results = await Promise.all(feeds.map(fetchFeed));
-  const body = document.getElementById(`news-${catKey}-body`);
-  body.innerHTML = '';
+  const grid = document.getElementById(`news-${catKey}-grid`);
+  grid.innerHTML = '';
   results.forEach(r=>{
-    const label = document.createElement('div');
-    label.className = 'block-label';
-    label.textContent = r.label;
-    body.appendChild(label);
-    if(r.items === null){
-      const e = document.createElement('div');
-      e.className = 'err';
-      e.textContent = 'Feed unavailable right now (rate-limited or down).';
-      body.appendChild(e);
-      return;
-    }
-    r.items.forEach(item=>{
-      const a = document.createElement('a');
-      a.className = 'news-item';
-      a.href = item.link;
-      a.target = '_blank';
-      a.innerHTML = `${item.title}<span class="src">${r.label}</span>`;
-      body.appendChild(a);
-    });
+    grid.appendChild(makeCard(r.label, buildFeedBody(r), {}));
   });
-  setUpdated(`news-${catKey}-updated`);
 }
 
 function loadAllNews(){
   Object.keys(NEWS_CATEGORIES).forEach(loadNewsCategory);
 }
 
-// ---------- ORCHESTRATION ----------
-function refreshAll(){
-  loadSports();
-  loadMarkets();
-  loadAllNews();
+// ---------- SPORTS CALENDAR (static reference data, verified Sept 2026) ----------
+const CALENDAR_US = [
+  {name:'NFL', start:'2026-09-09', end:'2027-02-14', note:'Super Bowl LXI: Feb 14, 2027 (SoFi Stadium)'},
+  {name:'NBA', start:'2026-10-20', end:'2027-06-20', note:'Regular season ends Apr 11, 2027; Finals in June 2027'},
+  {name:'MLB', start:'2026-03-25', end:'2026-10-31', note:'Regular season ends Sep 27; World Series Oct 23\u201331'},
+  {name:'NHL', start:'2026-09-29', end:'2027-06-20', note:'Regular season ends Apr 10, 2027; Cup awarded mid-June 2027'},
+  {name:'MLS', start:'2026-02-21', end:'2026-12-18', note:'Paused May 25\u2013Jul 16 for the World Cup; MLS Cup Dec 18'},
+  {name:'The Masters (golf)', start:'2026-04-09', end:'2026-04-12', note:'Augusta National'},
+  {name:'PGA Championship (golf)', start:'2026-05-14', end:'2026-05-17', note:'Aronimink GC'},
+  {name:'U.S. Open (golf)', start:'2026-06-18', end:'2026-06-21', note:'Shinnecock Hills'},
+];
+const CALENDAR_WORLD = [
+  {name:'Premier League', start:'2026-08-22', end:'2027-05-30', note:'England'},
+  {name:'Champions League', start:'2026-08-27', end:'2027-06-05', note:'Final reported as either May 22 or Jun 5, 2027 depending on source \u2014 unconfirmed'},
+  {name:'La Liga', start:'2026-08-15', end:'2027-05-30', note:'Spain; end date not yet fully confirmed'},
+  {name:'IPL (cricket)', start:'2026-03-28', end:'2026-05-31', note:'Next edition typically runs Mar\u2013May annually'},
+  {name:'Australian Open (tennis)', start:'2026-01-18', end:'2026-02-01', note:''},
+  {name:'French Open (tennis)', start:'2026-05-24', end:'2026-06-07', note:'Roland Garros'},
+  {name:'Wimbledon (tennis)', start:'2026-06-29', end:'2026-07-12', note:''},
+  {name:'US Open (tennis)', start:'2026-08-31', end:'2026-09-13', note:''},
+  {name:'The Open Championship (golf)', start:'2026-07-16', end:'2026-07-19', note:'Royal Birkdale \u2014 exact dates approximate, unconfirmed'},
+  {name:'Formula 1', start:'2026-03-06', end:'2026-12-06', note:'Melbourne \u2192 Abu Dhabi, 24 races'},
+  {name:'FIFA World Cup', start:'2026-06-11', end:'2026-07-19', note:'USA / Canada / Mexico \u2014 next edition 2030'},
+  {name:'Winter Olympics', start:'2026-02-06', end:'2026-02-22', note:'Milano Cortina \u2014 next Winter Games 2030'},
+];
+
+function calStatus(start, end){
+  const now = new Date();
+  const s = new Date(start + 'T00:00:00');
+  const e = new Date(end + 'T23:59:59');
+  if(now >= s && now <= e) return 'live';
+  if(now < s) return 'upcoming';
+  return 'ended';
 }
-refreshAll();
+
+function renderCalendarGroup(containerId, data){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'grid';
+  data.forEach(item=>{
+    const status = calStatus(item.start, item.end);
+    const badgeText = status === 'live' ? 'In season' : (status === 'upcoming' ? 'Upcoming' : 'Ended');
+    const body = document.createElement('div');
+    body.innerHTML = `
+      <div class="row" style="align-items:flex-start;">
+        <div class="who">
+          <div class="cal-dates">${item.start} \u2192 ${item.end}</div>
+          ${item.note ? `<div class="cal-note">${item.note}</div>` : ''}
+        </div>
+        <div class="cal-badge ${status}">${badgeText}</div>
+      </div>
+    `;
+    grid.appendChild(makeCard(item.name, body, {live: status === 'live'}));
+  });
+  container.appendChild(grid);
+}
+
+function renderCalendar(){
+  renderCalendarGroup('calendar-us', CALENDAR_US);
+  renderCalendarGroup('calendar-world', CALENDAR_WORLD);
+}
+
+// ---------- ORCHESTRATION ----------
+loadSports();
+loadMarkets();
+loadAllNews();
 renderCalendar();
 setInterval(loadSports, 45_000);
 setInterval(loadMarkets, 30_000);
