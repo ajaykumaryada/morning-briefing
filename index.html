@@ -401,8 +401,8 @@ async function fetchSport(sport){
       const state = ev.status?.type?.state;
       const shortDetail = ev.status?.type?.shortDetail || '';
       return {
-        home: home?.team?.abbreviation || home?.team?.shortDisplayName || '?',
-        away: away?.team?.abbreviation || away?.team?.shortDisplayName || '?',
+        home: home?.team?.displayName || home?.team?.shortDisplayName || home?.team?.abbreviation || '?',
+        away: away?.team?.displayName || away?.team?.shortDisplayName || away?.team?.abbreviation || '?',
         homeScore: home?.score ?? '',
         awayScore: away?.score ?? '',
         live: state === 'in',
