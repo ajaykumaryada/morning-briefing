@@ -130,6 +130,15 @@
     font-family:ui-monospace,"SF Mono","IBM Plex Mono",Consolas,monospace;
   }
   .row .state.live{color:var(--up);}
+  .cal-badge{
+    font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.4px;
+    padding:2px 7px; border:1px solid var(--line); white-space:nowrap;
+  }
+  .cal-badge.live{color:var(--up); border-color:var(--up);}
+  .cal-badge.upcoming{color:var(--ink-dim); border-color:var(--line);}
+  .cal-badge.ended{color:var(--ink-dim); border-color:var(--line); opacity:.5;}
+  .cal-dates{font-size:11px; color:var(--ink-dim); font-family:ui-monospace,"SF Mono","IBM Plex Mono",Consolas,monospace;}
+  .cal-note{font-size:11px; color:var(--ink-dim); margin-top:2px;}
   .price-row .delta.up{color:var(--up);}
   .price-row .delta.down{color:var(--down);}
   .news-item{
@@ -162,6 +171,8 @@
   <button data-tab="world">World Affairs</button>
   <button data-tab="health">Health Care</button>
   <button data-tab="tech">Technology</button>
+  <button data-tab="india">India</button>
+  <button data-tab="calendar">Sports Calendar</button>
 </nav>
 
 <main>
@@ -223,12 +234,35 @@
     </div>
   </div>
 
+  <!-- INDIA -->
+  <div class="tab-content" id="tab-india">
+    <div class="panel">
+      <div class="panel-head"><h2>India</h2><span class="updated" id="news-india-updated">loading…</span></div>
+      <div id="news-india-body"><div class="empty">Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- SPORTS CALENDAR -->
+  <div class="tab-content" id="tab-calendar">
+    <div class="subtoggle" id="calendar-subtoggle">
+      <button data-sub="us" class="active">USA</button>
+      <button data-sub="world">International</button>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2 id="calendar-h2">Season Calendar — USA</h2><span class="updated" id="calendar-updated"></span></div>
+      <div class="sub-content active" id="calendar-us"></div>
+      <div class="sub-content" id="calendar-world"></div>
+    </div>
+  </div>
+
 </main>
 
 <footer>
   Sports: ESPN's public scoreboard endpoints (no key), refreshed every 45s. Cricket (Test/IPL) links out to ESPNcricinfo — ESPN's cricket API needs a live series ID rather than a fixed slug.
   Markets: CoinGecko for crypto (no key, ~30s). US indices (S&P 500 / Nasdaq 100 / Dow 30) shown via SPY/QQQ/DIA proxies through Alpaca's Market Data API (IEX feed), authenticated with a paper-trading account key — no real funds are reachable through this key even if exposed.
   News: RSS via rss2json's public endpoint (10-min refresh), which rate-limits unauthenticated traffic — get a free key at rss2json.com and paste it into RSS2JSON_KEY below for reliable refreshes.
+  India tab: no single regional outlet publishes a reliable, stable RSS feed for Telangana specifically, so this uses Google News' topic and keyword-search RSS (India edition) instead — "Telangana" is a live search across all indexed outlets, not one publication.
+  Sports Calendar: static reference data (season start/end dates), not a live feed — verified as of Sept 2026. A couple of dates (Champions League final, La Liga end date, The Open Championship) had conflicting or unconfirmed reporting at write time and are flagged inline. Refresh this list yourself as seasons roll over.
 </footer>
 
 <script>
@@ -264,6 +298,78 @@ document.getElementById('sports-subtoggle').addEventListener('click', (e)=>{
   document.getElementById('sports-' + btn.dataset.sub).classList.add('active');
   document.getElementById('sports-h2').textContent = 'Today — ' + (btn.dataset.sub === 'us' ? 'USA' : 'International');
 });
+
+document.getElementById('calendar-subtoggle').addEventListener('click', (e)=>{
+  const btn = e.target.closest('button[data-sub]');
+  if(!btn) return;
+  document.querySelectorAll('#calendar-subtoggle button').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#tab-calendar .sub-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('calendar-' + btn.dataset.sub).classList.add('active');
+  document.getElementById('calendar-h2').textContent = 'Season Calendar — ' + (btn.dataset.sub === 'us' ? 'USA' : 'International');
+});
+
+// ---------- SPORTS CALENDAR (static reference data, verified as of Sept 2026) ----------
+// Dates are ISO (YYYY-MM-DD). One-off global events (Olympics, World Cup) list their
+// actual 2026 dates even if already past, since this is a whole-year reference.
+const CALENDAR_US = [
+  {name:'NFL', start:'2026-09-09', end:'2027-02-14', note:'Super Bowl LXI: Feb 14, 2027 (SoFi Stadium)'},
+  {name:'NBA', start:'2026-10-20', end:'2027-06-20', note:'Regular season ends Apr 11, 2027; Finals in June 2027'},
+  {name:'MLB', start:'2026-03-25', end:'2026-10-31', note:'Regular season ends Sep 27; World Series Oct 23\u201331'},
+  {name:'NHL', start:'2026-09-29', end:'2027-06-20', note:'Regular season ends Apr 10, 2027; Cup awarded mid-June 2027'},
+  {name:'MLS', start:'2026-02-21', end:'2026-12-18', note:'Paused May 25\u2013Jul 16 for the World Cup; MLS Cup Dec 18'},
+  {name:'The Masters (golf)', start:'2026-04-09', end:'2026-04-12', note:'Augusta National'},
+  {name:'PGA Championship (golf)', start:'2026-05-14', end:'2026-05-17', note:'Aronimink GC'},
+  {name:'U.S. Open (golf)', start:'2026-06-18', end:'2026-06-21', note:'Shinnecock Hills'},
+];
+const CALENDAR_WORLD = [
+  {name:'Premier League', start:'2026-08-22', end:'2027-05-30', note:'England'},
+  {name:'Champions League', start:'2026-08-27', end:'2027-06-05', note:'Final date reported as either May 22 or Jun 5, 2027 depending on source \u2014 unconfirmed'},
+  {name:'La Liga', start:'2026-08-15', end:'2027-05-30', note:'Spain; end date not yet fully confirmed'},
+  {name:'IPL (cricket)', start:'2026-03-28', end:'2026-05-31', note:'Next edition typically runs Mar\u2013May annually'},
+  {name:'Australian Open (tennis)', start:'2026-01-18', end:'2026-02-01', note:''},
+  {name:'French Open (tennis)', start:'2026-05-24', end:'2026-06-07', note:'Roland Garros'},
+  {name:'Wimbledon (tennis)', start:'2026-06-29', end:'2026-07-12', note:''},
+  {name:'US Open (tennis)', start:'2026-08-31', end:'2026-09-13', note:''},
+  {name:'The Open Championship (golf)', start:'2026-07-16', end:'2026-07-19', note:'Royal Birkdale \u2014 exact dates approximate, unconfirmed'},
+  {name:'Formula 1', start:'2026-03-06', end:'2026-12-06', note:'Melbourne \u2192 Abu Dhabi, 24 races'},
+  {name:'FIFA World Cup', start:'2026-06-11', end:'2026-07-19', note:'USA / Canada / Mexico \u2014 next edition 2030'},
+  {name:'Winter Olympics', start:'2026-02-06', end:'2026-02-22', note:'Milano Cortina \u2014 next Winter Games 2030'},
+];
+
+function calStatus(start, end){
+  const now = new Date();
+  const s = new Date(start + 'T00:00:00');
+  const e = new Date(end + 'T23:59:59');
+  if(now >= s && now <= e) return 'live';
+  if(now < s) return 'upcoming';
+  return 'ended';
+}
+
+function renderCalendarGroup(container, data){
+  container.innerHTML = '';
+  data.forEach(item=>{
+    const status = calStatus(item.start, item.end);
+    const badgeText = status === 'live' ? 'In season' : (status === 'upcoming' ? 'Upcoming' : 'Ended');
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `
+      <div class="who">
+        <div class="team"><span>${item.name}</span></div>
+        <div class="cal-dates">${item.start} \u2192 ${item.end}</div>
+        ${item.note ? `<div class="cal-note">${item.note}</div>` : ''}
+      </div>
+      <div class="cal-badge ${status}">${badgeText}</div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function renderCalendar(){
+  renderCalendarGroup(document.getElementById('calendar-us'), CALENDAR_US);
+  renderCalendarGroup(document.getElementById('calendar-world'), CALENDAR_WORLD);
+  document.getElementById('calendar-updated').textContent = 'reference data';
+}
 
 // ---------- SPORTS ----------
 const SPORTS_US = [
@@ -464,6 +570,12 @@ const NEWS_CATEGORIES = {
     {label:'Ars Technica', url:'http://feeds.arstechnica.com/arstechnica/index'},
     {label:'BBC Technology', url:'http://feeds.bbci.co.uk/news/technology/rss.xml'},
   ],
+  india: [
+    {label:'Top Stories (India)', url:'https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en'},
+    {label:'Business (India)', url:'https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=en-IN&gl=IN&ceid=IN:en'},
+    {label:'Politics (India)', url:'https://news.google.com/rss/headlines/section/topic/NATION?hl=en-IN&gl=IN&ceid=IN:en'},
+    {label:'Telangana', url:'https://news.google.com/rss/search?q=Telangana&hl=en-IN&gl=IN&ceid=IN:en'},
+  ],
 };
 
 async function fetchFeed(feed){
@@ -519,6 +631,7 @@ function refreshAll(){
   loadAllNews();
 }
 refreshAll();
+renderCalendar();
 setInterval(loadSports, 45_000);
 setInterval(loadMarkets, 30_000);
 setInterval(loadAllNews, 10 * 60_000);
