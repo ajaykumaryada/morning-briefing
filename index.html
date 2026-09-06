@@ -269,7 +269,7 @@
   News: RSS via rss2json's public endpoint (10-min refresh), which rate-limits unauthenticated traffic — get a free key at rss2json.com and paste it into RSS2JSON_KEY below for reliable refreshes.
   India tab: no single regional outlet publishes a reliable, stable RSS feed for Telangana specifically, so this uses Google News' topic and keyword-search RSS (India edition) instead — bylines are parsed out of each headline's "– Publisher" suffix.
   Sports Calendar: static reference data (season start/end dates), not a live feed — verified as of Sept 2026. A couple of dates (Champions League final, La Liga end date, The Open Championship) had conflicting or unconfirmed reporting at write time and are flagged inline. Refresh this list yourself as seasons roll over.
-  Government tab: official U.S. sources only. This calls the Federal Register's actual documented JSON API (federalregister.gov/api/v1/documents.json) directly — no RSS, no proxy — which is the real, confirmed public interface, unlike an earlier RSS URL I gave you that turned out to be wrong. I couldn't find a verified official FDA newsroom RSS URL (their feed structure has moved over the years and I don't have a confirmed current address), so I dropped those two cards rather than guess again — if you find FDA's current feed URL on their site, send it and I'll add it back. Financial-markets and digital-asset cards use the same API scoped to SEC/Treasury/CFTC and a "digital assets" term search; the executive-order card filters to presidential documents specifically. Agency-slug filters are a reasonable-confidence guess at Federal Register's exact naming convention, not independently verified one-by-one — if a card returns suspiciously few results, that's the likely cause.
+  Government tab: official U.S. sources only. This calls the Federal Register's actual documented JSON API (federalregister.gov/api/v1/documents.json) directly — no RSS, no proxy — which is the real, confirmed public interface, unlike an earlier RSS URL I gave you that turned out to be wrong. I couldn't find a verified official FDA newsroom RSS URL (their feed structure has moved over the years and I don't have a confirmed current address), so I dropped those two cards rather than guess again — if you find FDA's current feed URL on their site, send it and I'll add it back. The Financial Markets card originally filtered to three agencies (SEC/Treasury/CFTC) at once, which the API most likely treats as "must match all three simultaneously" rather than "any of the three" — that's almost certainly why it came back empty, so it's now an unfiltered term search across all agencies instead, matching the pattern that already works reliably for the other cards.
 </footer>
 
 <script>
@@ -698,7 +698,7 @@ async function loadAllNews(){
 const GOV_QUERIES = [
   {label:'AI Policy — Federal Register (All Agencies)', term:'artificial intelligence'},
   {label:'AI & Healthcare — Federal Register (FDA)', term:'artificial intelligence', agencies:['food-and-drug-administration']},
-  {label:'Financial Markets — SEC / Treasury / CFTC', term:'financial markets', agencies:['securities-and-exchange-commission','department-of-the-treasury','commodity-futures-trading-commission']},
+  {label:'Financial Markets Policy — Federal Register (All Agencies)', term:'financial markets'},
   {label:'Digital Assets & Cryptocurrency', term:'digital assets'},
   {label:'Executive Orders — Economy & Finance', term:'financial', docType:'PRESDOCU'},
 ];
