@@ -314,7 +314,20 @@ document.getElementById('tabs').addEventListener('click', (e)=>{
   document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  try{ localStorage.setItem('briefing-active-tab', btn.dataset.tab); }catch(e){}
 });
+
+// Restore the last-viewed tab on load, if any.
+try{
+  const savedTab = localStorage.getItem('briefing-active-tab');
+  if(savedTab && document.getElementById('tab-' + savedTab)){
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    const btn = document.querySelector(`nav.tabs button[data-tab="${savedTab}"]`);
+    if(btn) btn.classList.add('active');
+    document.getElementById('tab-' + savedTab).classList.add('active');
+  }
+}catch(e){}
 
 document.getElementById('sports-subtoggle').addEventListener('click', (e)=>{
   const btn = e.target.closest('button[data-sub]');
@@ -323,7 +336,18 @@ document.getElementById('sports-subtoggle').addEventListener('click', (e)=>{
   document.querySelectorAll('#tab-sports .sub-content').forEach(c=>c.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('sports-' + btn.dataset.sub).classList.add('active');
+  try{ localStorage.setItem('briefing-sports-sub', btn.dataset.sub); }catch(e){}
 });
+try{
+  const savedSportsSub = localStorage.getItem('briefing-sports-sub');
+  if(savedSportsSub && document.getElementById('sports-' + savedSportsSub)){
+    document.querySelectorAll('#sports-subtoggle button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('#tab-sports .sub-content').forEach(c=>c.classList.remove('active'));
+    const btn = document.querySelector(`#sports-subtoggle button[data-sub="${savedSportsSub}"]`);
+    if(btn) btn.classList.add('active');
+    document.getElementById('sports-' + savedSportsSub).classList.add('active');
+  }
+}catch(e){}
 
 document.getElementById('calendar-subtoggle').addEventListener('click', (e)=>{
   const btn = e.target.closest('button[data-sub]');
@@ -332,7 +356,18 @@ document.getElementById('calendar-subtoggle').addEventListener('click', (e)=>{
   document.querySelectorAll('#tab-calendar .sub-content').forEach(c=>c.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('calendar-' + btn.dataset.sub).classList.add('active');
+  try{ localStorage.setItem('briefing-calendar-sub', btn.dataset.sub); }catch(e){}
 });
+try{
+  const savedCalSub = localStorage.getItem('briefing-calendar-sub');
+  if(savedCalSub && document.getElementById('calendar-' + savedCalSub)){
+    document.querySelectorAll('#calendar-subtoggle button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('#tab-calendar .sub-content').forEach(c=>c.classList.remove('active'));
+    const btn = document.querySelector(`#calendar-subtoggle button[data-sub="${savedCalSub}"]`);
+    if(btn) btn.classList.add('active');
+    document.getElementById('calendar-' + savedCalSub).classList.add('active');
+  }
+}catch(e){}
 
 // ---------- SPORTS ----------
 const SPORTS_US = [
