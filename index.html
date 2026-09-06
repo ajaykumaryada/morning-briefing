@@ -41,103 +41,109 @@
     color:var(--ink-dim);
     font-size:13px;
   }
-  main{
-    display:grid;
-    grid-template-columns:1.1fr 0.9fr 1.3fr;
-    gap:1px;
-    background:var(--line);
-  }
-  @media (max-width:900px){
-    main{grid-template-columns:1fr;}
-  }
-  section{
-    background:var(--panel);
-    padding:18px 20px 24px;
-    min-height:200px;
-  }
-  section > .section-head{
+
+  nav.tabs{
     display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:12px;
+    gap:2px;
+    padding:0 24px;
+    border-bottom:1px solid var(--line);
+    overflow-x:auto;
   }
-  section h2{
-    font-size:12px;
-    font-weight:600;
-    text-transform:uppercase;
-    letter-spacing:.6px;
+  nav.tabs button{
+    background:none;
+    border:none;
+    color:var(--ink-dim);
+    font-size:13px;
+    font-weight:500;
+    padding:14px 14px 12px;
+    cursor:pointer;
+    border-bottom:2px solid transparent;
+    white-space:nowrap;
+  }
+  nav.tabs button:hover{color:var(--ink);}
+  nav.tabs button.active{
     color:var(--gold);
-    margin:0;
+    border-bottom:2px solid var(--gold);
+  }
+
+  main{max-width:900px; margin:0 auto; padding:20px 24px 40px;}
+  .tab-content{display:none;}
+  .tab-content.active{display:block;}
+
+  .subtoggle{
+    display:flex; gap:8px; margin-bottom:16px;
+  }
+  .subtoggle button{
+    background:var(--panel);
+    border:1px solid var(--line);
+    color:var(--ink-dim);
+    font-size:12px;
+    padding:6px 12px;
+    cursor:pointer;
+  }
+  .subtoggle button.active{
+    color:var(--gold);
+    border-color:var(--gold);
+  }
+  .sub-content{display:none;}
+  .sub-content.active{display:block;}
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    padding:16px 18px;
+    margin-bottom:16px;
+  }
+  .panel-head{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:8px;
+  }
+  .panel-head h2{
+    font-size:11px; font-weight:600; text-transform:uppercase;
+    letter-spacing:.6px; color:var(--gold); margin:0;
   }
   .updated{
-    font-size:11px;
-    color:var(--ink-dim);
+    font-size:11px; color:var(--ink-dim);
     font-family:ui-monospace,"SF Mono","IBM Plex Mono",Consolas,monospace;
   }
   .block-label{
-    font-size:11px;
-    color:var(--ink-dim);
-    margin:16px 0 6px;
-    padding-top:10px;
-    border-top:1px solid var(--line);
+    font-size:11px; color:var(--ink-dim); margin:14px 0 6px;
+    padding-top:10px; border-top:1px solid var(--line);
   }
-  .block-label:first-child{border-top:none;padding-top:0;margin-top:0;}
+  .block-label:first-child{border-top:none; padding-top:0; margin-top:0;}
   .row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:6px 0;
-    border-bottom:1px solid rgba(255,255,255,0.04);
-    gap:10px;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.04); gap:10px;
   }
   .row:last-child{border-bottom:none;}
-  .row .who{flex:1;min-width:0;}
+  .row .who{flex:1; min-width:0;}
   .row .team{
-    display:flex;justify-content:space-between;gap:8px;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    display:flex; justify-content:space-between; gap:8px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
   .row .score{
     font-family:ui-monospace,"SF Mono","IBM Plex Mono",Consolas,monospace;
     font-weight:600;
   }
   .row .state{
-    font-size:11px;
-    color:var(--ink-dim);
-    min-width:64px;
-    text-align:right;
+    font-size:11px; color:var(--ink-dim); min-width:64px; text-align:right;
     font-family:ui-monospace,"SF Mono","IBM Plex Mono",Consolas,monospace;
   }
   .row .state.live{color:var(--up);}
   .price-row .delta.up{color:var(--up);}
   .price-row .delta.down{color:var(--down);}
   .news-item{
-    display:block;
-    padding:7px 0;
-    border-bottom:1px solid rgba(255,255,255,0.04);
-    color:var(--ink);
-    text-decoration:none;
-    font-size:13px;
-    line-height:1.35;
+    display:block; padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.04);
+    color:var(--ink); text-decoration:none; font-size:13px; line-height:1.35;
   }
   .news-item:hover{color:var(--gold);}
-  .news-item .src{
-    display:block;
-    font-size:10px;
-    color:var(--ink-dim);
-    margin-top:2px;
-  }
-  .empty, .err{
-    color:var(--ink-dim);
-    font-size:12px;
-    padding:6px 0;
-  }
+  .news-item .src{display:block; font-size:10px; color:var(--ink-dim); margin-top:2px;}
+  .empty, .err{color:var(--ink-dim); font-size:12px; padding:6px 0;}
   .err{color:var(--down);}
+
   footer{
-    padding:16px 24px 28px;
-    color:var(--ink-dim);
-    font-size:11px;
-    line-height:1.6;
-    border-top:1px solid var(--line);
+    padding:16px 24px 28px; color:var(--ink-dim); font-size:11px;
+    line-height:1.6; border-top:1px solid var(--line);
   }
   footer a{color:var(--gold);}
 </style>
@@ -149,28 +155,80 @@
   <div class="clock" id="clock">--:--:--</div>
 </header>
 
+<nav class="tabs" id="tabs">
+  <button data-tab="sports" class="active">Sports</button>
+  <button data-tab="business">Business</button>
+  <button data-tab="politics">Politics</button>
+  <button data-tab="world">World Affairs</button>
+  <button data-tab="health">Health Care</button>
+  <button data-tab="tech">Technology</button>
+</nav>
+
 <main>
-  <section id="sports">
-    <div class="section-head"><h2>Sports — Today</h2><span class="updated" id="sports-updated">loading…</span></div>
-    <div id="sports-body"><div class="empty">Loading scoreboards…</div></div>
-  </section>
 
-  <section id="markets">
-    <div class="section-head"><h2>Markets</h2><span class="updated" id="markets-updated">loading…</span></div>
-    <div id="markets-body"><div class="empty">Loading prices…</div></div>
-  </section>
+  <!-- SPORTS -->
+  <div class="tab-content active" id="tab-sports">
+    <div class="subtoggle" id="sports-subtoggle">
+      <button data-sub="us" class="active">USA</button>
+      <button data-sub="world">International</button>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2 id="sports-h2">Today — USA</h2><span class="updated" id="sports-updated">loading…</span></div>
+      <div class="sub-content active" id="sports-us"><div class="empty">Loading…</div></div>
+      <div class="sub-content" id="sports-world"><div class="empty">Loading…</div></div>
+    </div>
+  </div>
 
-  <section id="news">
-    <div class="section-head"><h2>News</h2><span class="updated" id="news-updated">loading…</span></div>
-    <div id="news-body"><div class="empty">Loading headlines…</div></div>
-  </section>
+  <!-- BUSINESS -->
+  <div class="tab-content" id="tab-business">
+    <div class="panel">
+      <div class="panel-head"><h2>Markets</h2><span class="updated" id="markets-updated">loading…</span></div>
+      <div id="markets-body"><div class="empty">Loading prices…</div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Business Headlines</h2><span class="updated" id="news-business-updated">loading…</span></div>
+      <div id="news-business-body"><div class="empty">Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- POLITICS -->
+  <div class="tab-content" id="tab-politics">
+    <div class="panel">
+      <div class="panel-head"><h2>Politics</h2><span class="updated" id="news-politics-updated">loading…</span></div>
+      <div id="news-politics-body"><div class="empty">Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- WORLD AFFAIRS -->
+  <div class="tab-content" id="tab-world">
+    <div class="panel">
+      <div class="panel-head"><h2>World Affairs</h2><span class="updated" id="news-world-updated">loading…</span></div>
+      <div id="news-world-body"><div class="empty">Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- HEALTH -->
+  <div class="tab-content" id="tab-health">
+    <div class="panel">
+      <div class="panel-head"><h2>Health Care</h2><span class="updated" id="news-health-updated">loading…</span></div>
+      <div id="news-health-body"><div class="empty">Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- TECH -->
+  <div class="tab-content" id="tab-tech">
+    <div class="panel">
+      <div class="panel-head"><h2>Technology</h2><span class="updated" id="news-tech-updated">loading…</span></div>
+      <div id="news-tech-body"><div class="empty">Loading…</div></div>
+    </div>
+  </div>
+
 </main>
 
 <footer>
-  Sports data: ESPN's public scoreboard endpoints (no key). Crypto: CoinGecko (no key, ~30s refresh).
-  US indices (S&P 500 / Nasdaq 100 / Dow 30) are shown via their SPY/QQQ/DIA ETF proxies through Alpaca's Market Data API (IEX feed, free tier), authenticated with a paper-trading account key — no real funds are reachable through this key even if exposed.
-  News: RSS via rss2json's public endpoint, which rate-limits unauthenticated traffic — get a free rss2json key at rss2json.com and paste it into RSS2JSON_KEY below for reliable refreshes.
-  Cricket: ESPN's cricket coverage needs a live series ID rather than a fixed slug, so it's not wired in — the panel links out to ESPNcricinfo instead.
+  Sports: ESPN's public scoreboard endpoints (no key), refreshed every 45s. Cricket (Test/IPL) links out to ESPNcricinfo — ESPN's cricket API needs a live series ID rather than a fixed slug.
+  Markets: CoinGecko for crypto (no key, ~30s). US indices (S&P 500 / Nasdaq 100 / Dow 30) shown via SPY/QQQ/DIA proxies through Alpaca's Market Data API (IEX feed), authenticated with a paper-trading account key — no real funds are reachable through this key even if exposed.
+  News: RSS via rss2json's public endpoint (10-min refresh), which rate-limits unauthenticated traffic — get a free key at rss2json.com and paste it into RSS2JSON_KEY below for reliable refreshes.
 </footer>
 
 <script>
@@ -185,20 +243,40 @@ function fmtTime(){
   return d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
 }
 setInterval(()=>{ document.getElementById('clock').textContent = fmtTime(); }, 1000);
+function setUpdated(id){ document.getElementById(id).textContent = fmtTime(); }
 
-function setUpdated(id){
-  document.getElementById(id).textContent = fmtTime();
-}
+// ---------- TAB / TOGGLE WIRING ----------
+document.getElementById('tabs').addEventListener('click', (e)=>{
+  const btn = e.target.closest('button[data-tab]');
+  if(!btn) return;
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+});
+
+document.getElementById('sports-subtoggle').addEventListener('click', (e)=>{
+  const btn = e.target.closest('button[data-sub]');
+  if(!btn) return;
+  document.querySelectorAll('#sports-subtoggle button').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#tab-sports .sub-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('sports-' + btn.dataset.sub).classList.add('active');
+  document.getElementById('sports-h2').textContent = 'Today — ' + (btn.dataset.sub === 'us' ? 'USA' : 'International');
+});
 
 // ---------- SPORTS ----------
-const SPORTS = [
+const SPORTS_US = [
   {label:"NFL", path:"football/nfl"},
   {label:"NBA", path:"basketball/nba"},
   {label:"MLB", path:"baseball/mlb"},
   {label:"NHL", path:"hockey/nhl"},
+  {label:"MLS", path:"soccer/usa.1"},
+];
+const SPORTS_WORLD = [
   {label:"Premier League", path:"soccer/eng.1"},
   {label:"Champions League", path:"soccer/uefa.champions"},
-  {label:"MLS", path:"soccer/usa.1"},
+  {label:"La Liga", path:"soccer/esp.1"},
 ];
 
 async function fetchSport(sport){
@@ -214,7 +292,7 @@ async function fetchSport(sport){
       const competitors = comp?.competitors || [];
       const home = competitors.find(c=>c.homeAway==='home');
       const away = competitors.find(c=>c.homeAway==='away');
-      const state = ev.status?.type?.state; // 'pre' | 'in' | 'post'
+      const state = ev.status?.type?.state;
       const shortDetail = ev.status?.type?.shortDetail || '';
       return {
         home: home?.team?.abbreviation || home?.team?.shortDisplayName || '?',
@@ -231,19 +309,16 @@ async function fetchSport(sport){
   }
 }
 
-async function loadSports(){
-  const results = await Promise.all(SPORTS.map(fetchSport));
-  const body = document.getElementById('sports-body');
-  body.innerHTML = '';
+function renderSportGroup(container, results, isWorld){
+  container.innerHTML = '';
   let anyGames = false;
   results.forEach(r=>{
-    if(r.rows === null) return; // fetch failed, skip silently
-    if(r.rows.length === 0) return; // nothing today
+    if(r.rows === null || r.rows.length === 0) return;
     anyGames = true;
     const label = document.createElement('div');
     label.className = 'block-label';
     label.textContent = r.label;
-    body.appendChild(label);
+    container.appendChild(label);
     r.rows.forEach(g=>{
       const row = document.createElement('div');
       row.className = 'row';
@@ -254,25 +329,36 @@ async function loadSports(){
         </div>
         <div class="state ${g.live ? 'live' : ''}">${g.detail}</div>
       `;
-      body.appendChild(row);
+      container.appendChild(row);
     });
   });
-  const cricketLabel = document.createElement('div');
-  cricketLabel.className = 'block-label';
-  cricketLabel.textContent = 'Cricket (Test / IPL)';
-  body.appendChild(cricketLabel);
-  const cricketLink = document.createElement('a');
-  cricketLink.href = 'https://www.espncricinfo.com/live-cricket-score';
-  cricketLink.target = '_blank';
-  cricketLink.className = 'news-item';
-  cricketLink.textContent = 'Open live cricket scores on ESPNcricinfo →';
-  body.appendChild(cricketLink);
+  if(isWorld){
+    const cricketLabel = document.createElement('div');
+    cricketLabel.className = 'block-label';
+    cricketLabel.textContent = 'Cricket (Test / IPL)';
+    container.appendChild(cricketLabel);
+    const cricketLink = document.createElement('a');
+    cricketLink.href = 'https://www.espncricinfo.com/live-cricket-score';
+    cricketLink.target = '_blank';
+    cricketLink.className = 'news-item';
+    cricketLink.textContent = 'Open live cricket scores on ESPNcricinfo →';
+    container.appendChild(cricketLink);
+  }
   if(!anyGames){
     const e = document.createElement('div');
     e.className = 'empty';
-    e.textContent = 'No games found for the major US leagues today.';
-    body.prepend(e);
+    e.textContent = 'No games found today.';
+    container.prepend(e);
   }
+}
+
+async function loadSports(){
+  const [usResults, worldResults] = await Promise.all([
+    Promise.all(SPORTS_US.map(fetchSport)),
+    Promise.all(SPORTS_WORLD.map(fetchSport)),
+  ]);
+  renderSportGroup(document.getElementById('sports-us'), usResults, false);
+  renderSportGroup(document.getElementById('sports-world'), worldResults, true);
   setUpdated('sports-updated');
 }
 
@@ -356,12 +442,29 @@ async function loadMarkets(){
   setUpdated('markets-updated');
 }
 
-// ---------- NEWS ----------
-const FEEDS = [
-  {label:'World / Politics', url:'http://feeds.bbci.co.uk/news/world/rss.xml'},
-  {label:'Technology', url:'http://feeds.arstechnica.com/arstechnica/index'},
-  {label:'Health', url:'https://rss.nytimes.com/services/xml/rss/nyt/Health.xml'},
-];
+// ---------- NEWS (per category) ----------
+const NEWS_CATEGORIES = {
+  business: [
+    {label:'BBC Business', url:'http://feeds.bbci.co.uk/news/business/rss.xml'},
+    {label:'NYT Business', url:'https://rss.nytimes.com/services/xml/rss/nyt/Business.xml'},
+  ],
+  politics: [
+    {label:'BBC Politics', url:'http://feeds.bbci.co.uk/news/politics/rss.xml'},
+    {label:'NYT Politics', url:'https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml'},
+  ],
+  world: [
+    {label:'BBC World', url:'http://feeds.bbci.co.uk/news/world/rss.xml'},
+    {label:'The Guardian World', url:'https://www.theguardian.com/world/rss'},
+  ],
+  health: [
+    {label:'NYT Health', url:'https://rss.nytimes.com/services/xml/rss/nyt/Health.xml'},
+    {label:'BBC Health', url:'http://feeds.bbci.co.uk/news/health/rss.xml'},
+  ],
+  tech: [
+    {label:'Ars Technica', url:'http://feeds.arstechnica.com/arstechnica/index'},
+    {label:'BBC Technology', url:'http://feeds.bbci.co.uk/news/technology/rss.xml'},
+  ],
+};
 
 async function fetchFeed(feed){
   const keyParam = RSS2JSON_KEY ? `&api_key=${RSS2JSON_KEY}` : '';
@@ -370,15 +473,16 @@ async function fetchFeed(feed){
     const res = await fetch(url);
     const data = await res.json();
     if(data.status !== 'ok') throw new Error(data.message || 'feed error');
-    return {label: feed.label, items: (data.items || []).slice(0,6), source: data.feed?.title || feed.label};
+    return {label: feed.label, items: (data.items || []).slice(0,8)};
   }catch(e){
     return {label: feed.label, items: null};
   }
 }
 
-async function loadNews(){
-  const results = await Promise.all(FEEDS.map(fetchFeed));
-  const body = document.getElementById('news-body');
+async function loadNewsCategory(catKey){
+  const feeds = NEWS_CATEGORIES[catKey];
+  const results = await Promise.all(feeds.map(fetchFeed));
+  const body = document.getElementById(`news-${catKey}-body`);
   body.innerHTML = '';
   results.forEach(r=>{
     const label = document.createElement('div');
@@ -397,23 +501,27 @@ async function loadNews(){
       a.className = 'news-item';
       a.href = item.link;
       a.target = '_blank';
-      a.innerHTML = `${item.title}<span class="src">${r.source}</span>`;
+      a.innerHTML = `${item.title}<span class="src">${r.label}</span>`;
       body.appendChild(a);
     });
   });
-  setUpdated('news-updated');
+  setUpdated(`news-${catKey}-updated`);
+}
+
+function loadAllNews(){
+  Object.keys(NEWS_CATEGORIES).forEach(loadNewsCategory);
 }
 
 // ---------- ORCHESTRATION ----------
 function refreshAll(){
   loadSports();
   loadMarkets();
-  loadNews();
+  loadAllNews();
 }
 refreshAll();
 setInterval(loadSports, 45_000);
 setInterval(loadMarkets, 30_000);
-setInterval(loadNews, 10 * 60_000);
+setInterval(loadAllNews, 10 * 60_000);
 </script>
 
 </body>
