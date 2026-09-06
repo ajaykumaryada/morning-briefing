@@ -187,6 +187,7 @@
   <button data-tab="tech">Technology</button>
   <button data-tab="india">India</button>
   <button data-tab="calendar">Sports Calendar</button>
+  <button data-tab="government">Government</button>
 </nav>
 
 <main>
@@ -255,6 +256,11 @@
     <div class="sub-content" id="calendar-world"></div>
   </div>
 
+  <!-- GOVERNMENT -->
+  <div class="tab-content" id="tab-government">
+    <div class="grid" id="news-government-grid"></div>
+  </div>
+
 </main>
 
 <footer>
@@ -263,6 +269,7 @@
   News: RSS via rss2json's public endpoint (10-min refresh), which rate-limits unauthenticated traffic — get a free key at rss2json.com and paste it into RSS2JSON_KEY below for reliable refreshes.
   India tab: no single regional outlet publishes a reliable, stable RSS feed for Telangana specifically, so this uses Google News' topic and keyword-search RSS (India edition) instead — bylines are parsed out of each headline's "– Publisher" suffix.
   Sports Calendar: static reference data (season start/end dates), not a live feed — verified as of Sept 2026. A couple of dates (Champions League final, La Liga end date, The Open Championship) had conflicting or unconfirmed reporting at write time and are flagged inline. Refresh this list yourself as seasons roll over.
+  Government tab: official U.S. sources only. The two Federal Register feeds (all-agency AI search, and AI filtered to FDA specifically for healthcare) use federalregister.gov's documented search-RSS feature and are high-confidence. The FDA "Health & Safety Updates" feed is a long-standing FDA feed found via a data.gov catalog entry but uses FDA's older URL scheme, so it may have moved. The FDA "Press Announcements" feed URL was inferred from FDA's current URL pattern (confirmed working for other FDA feeds) but not independently verified — if it 404s, tell me and I'll track down the current path.
 </footer>
 
 <script>
@@ -598,7 +605,9 @@ async function loadMarkets(){
 // ---------- NEWS ----------
 const NEWS_CATEGORIES = {
   business: [
-    {label:'BBC Business', url:'http://feeds.bbci.co.uk/news/business/rss.xml'},
+    {label:'CNBC', url:'https://www.cnbc.com/id/100003114/device/rss/rss.html'},
+    {label:'MarketWatch', url:'http://feeds.marketwatch.com/marketwatch/topstories/'},
+    {label:'Fortune', url:'https://fortune.com/feed/'},
     {label:'NYT Business', url:'https://rss.nytimes.com/services/xml/rss/nyt/Business.xml'},
   ],
   politics: [
@@ -618,6 +627,12 @@ const NEWS_CATEGORIES = {
     {label:'Business (India)', url:'https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=en-IN&gl=IN&ceid=IN:en'},
     {label:'Politics (India)', url:'https://news.google.com/rss/headlines/section/topic/NATION?hl=en-IN&gl=IN&ceid=IN:en'},
     {label:'Telangana', url:'https://news.google.com/rss/search?q=Telangana&hl=en-IN&gl=IN&ceid=IN:en'},
+  ],
+  government: [
+    {label:'Federal Register — AI (all agencies)', url:'https://www.federalregister.gov/documents/search.rss?conditions%5Bterm%5D=artificial+intelligence'},
+    {label:'Federal Register — AI at FDA (healthcare)', url:'https://www.federalregister.gov/documents/search.rss?conditions%5Bterm%5D=artificial+intelligence&conditions%5Bagencies%5D%5B%5D=food-and-drug-administration'},
+    {label:'FDA — Health & Safety Updates', url:'https://www.fda.gov/AboutFDA/ContactFDA/StayInformed/RSSFeeds/Consumers/rss.xml'},
+    {label:'FDA — Press Announcements', url:'https://www.fda.gov/about-fda/contact-fda/stay-informed/rss-feeds/press-announcements/rss.xml'},
   ],
 };
 
