@@ -269,7 +269,7 @@
   News: RSS via rss2json's public endpoint (10-min refresh), which rate-limits unauthenticated traffic — get a free key at rss2json.com and paste it into RSS2JSON_KEY below for reliable refreshes.
   India tab: no single regional outlet publishes a reliable, stable RSS feed for Telangana specifically, so this uses Google News' topic and keyword-search RSS (India edition) instead — bylines are parsed out of each headline's "– Publisher" suffix.
   Sports Calendar: static reference data (season start/end dates), not a live feed — verified as of Sept 2026. A couple of dates (Champions League final, La Liga end date, The Open Championship) had conflicting or unconfirmed reporting at write time and are flagged inline. Refresh this list yourself as seasons roll over.
-  Government tab: official U.S. sources only. The two Federal Register feeds (all-agency AI search, and AI filtered to FDA specifically for healthcare) use federalregister.gov's documented search-RSS feature and are high-confidence. The FDA "Health & Safety Updates" feed is a long-standing FDA feed found via a data.gov catalog entry but uses FDA's older URL scheme, so it may have moved. The FDA "Press Announcements" feed URL was inferred from FDA's current URL pattern (confirmed working for other FDA feeds) but not independently verified — if it 404s, tell me and I'll track down the current path.
+  Government tab: official U.S. sources only. This calls the Federal Register's actual documented JSON API (federalregister.gov/api/v1/documents.json) directly — no RSS, no proxy — which is the real, confirmed public interface, unlike an earlier RSS URL I gave you that turned out to be wrong. I couldn't find a verified official FDA newsroom RSS URL (their feed structure has moved over the years and I don't have a confirmed current address), so I dropped those two cards rather than guess again — if you find FDA's current feed URL on their site, send it and I'll add it back.
 </footer>
 
 <script>
@@ -628,12 +628,6 @@ const NEWS_CATEGORIES = {
     {label:'Politics (India)', url:'https://news.google.com/rss/headlines/section/topic/NATION?hl=en-IN&gl=IN&ceid=IN:en'},
     {label:'Telangana', url:'https://news.google.com/rss/search?q=Telangana&hl=en-IN&gl=IN&ceid=IN:en'},
   ],
-  government: [
-    {label:'Federal Register — AI (all agencies)', url:'https://www.federalregister.gov/documents/search.rss?conditions%5Bterm%5D=artificial+intelligence'},
-    {label:'Federal Register — AI at FDA (healthcare)', url:'https://www.federalregister.gov/documents/search.rss?conditions%5Bterm%5D=artificial+intelligence&conditions%5Bagencies%5D%5B%5D=food-and-drug-administration'},
-    {label:'FDA — Health & Safety Updates', url:'https://www.fda.gov/AboutFDA/ContactFDA/StayInformed/RSSFeeds/Consumers/rss.xml'},
-    {label:'FDA — Press Announcements', url:'https://www.fda.gov/about-fda/contact-fda/stay-informed/rss-feeds/press-announcements/rss.xml'},
-  ],
 };
 
 const TECH_GROUPS = {
@@ -694,9 +688,53 @@ async function loadFeedGroup(gridId, feeds){
   });
 }
 
-function loadAllNews(){
+async function loadAllNews(){
   Object.keys(NEWS_CATEGORIES).forEach(key => loadFeedGroup(`news-${key}-grid`, NEWS_CATEGORIES[key]));
   Object.keys(TECH_GROUPS).forEach(key => loadFeedGroup(`news-${key}-grid`, TECH_GROUPS[key]));
+  await loadGovernment();
+}
+
+// ---------- GOVERNMENT (Federal Register's real JSON API, no RSS/proxy involved) ----------
+const GOV_QUERIES = [
+  {label:'AI Policy — Federal Register (All Agencies)', term:'artificial intelligence', agency:null},
+  {label:'AI & Healthcare — Federal Register (FDA)', term:'artificial intelligence', agency:'food-and-drug-administration'},
+];
+
+async function fetchGovCard(q){
+  const body = document.createElement('div');
+  try{
+    let url = `https://www.federalregister.gov/api/v1/documents.json?per_page=10&order=newest&conditions[term]=${encodeURIComponent(q.term)}`;
+    if(q.agency) url += `&conditions[agencies][]=${encodeURIComponent(q.agency)}`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    const results = data.results || [];
+    if(results.length === 0){
+      body.innerHTML = '<div class="empty">No matching documents found.</div>';
+    }else{
+      results.forEach(doc=>{
+        const a = document.createElement('a');
+        a.className = 'news-item';
+        a.href = doc.html_url;
+        a.target = '_blank';
+        const agencyNames = (doc.agencies || []).map(ag=>ag.name).join(', ');
+        a.innerHTML = `<span class="headline">${doc.title}</span><span class="src">${doc.type || ''}${agencyNames ? ' — ' + agencyNames : ''} · ${doc.publication_date || ''}</span>`;
+        body.appendChild(a);
+      });
+    }
+  }catch(e){
+    body.innerHTML = '<div class="err">Unavailable right now (Federal Register API may be down, or blocked this request).</div>';
+  }
+  return body;
+}
+
+async function loadGovernment(){
+  const grid = document.getElementById('news-government-grid');
+  grid.innerHTML = '';
+  const results = await Promise.all(GOV_QUERIES.map(fetchGovCard));
+  GOV_QUERIES.forEach((q, i)=>{
+    grid.appendChild(makeCard(q.label, results[i], {}));
+  });
 }
 
 // ---------- SPORTS CALENDAR (static reference data, verified Sept 2026) ----------
