@@ -140,6 +140,19 @@
   }
   .row .state.live{color:var(--up); font-weight:600;}
   .game-meta{font-size:11px; color:var(--ink-dim); line-height:1.5; margin-top:4px;}
+  .party-tag{
+    font-size:10px; font-weight:700; padding:1px 5px; border-radius:2px; flex-shrink:0;
+  }
+  .party-tag.r{background:rgba(193,84,76,0.18); color:#e08078;}
+  .party-tag.d{background:rgba(91,141,201,0.18); color:#7fa8de;}
+  .party-tag.i{background:rgba(139,147,156,0.18); color:var(--ink-dim);}
+  .member-row{
+    display:flex; justify-content:space-between; align-items:center; gap:8px;
+    padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:12.5px;
+  }
+  .member-row:last-child{border-bottom:none;}
+  .member-name{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .member-seat{font-size:11px; color:var(--ink-dim); font-family:var(--mono); flex-shrink:0;}
   .price-row .delta.up{color:var(--up);}
   .price-row .delta.down{color:var(--down);}
 
@@ -189,6 +202,7 @@
   <button data-tab="india">India</button>
   <button data-tab="calendar">Sports Calendar</button>
   <button data-tab="government">Government</button>
+  <button data-tab="congress">Congress</button>
 </nav>
 
 <main>
@@ -262,6 +276,12 @@
     <div class="grid" id="news-government-grid"></div>
   </div>
 
+  <!-- CONGRESS -->
+  <div class="tab-content" id="tab-congress">
+    <div id="congress-status" class="empty" style="margin-bottom:14px;"></div>
+    <div class="grid" id="congress-grid"></div>
+  </div>
+
 </main>
 
 <footer>
@@ -270,13 +290,17 @@
   News: RSS via rss2json's public endpoint (10-min refresh), which rate-limits unauthenticated traffic — get a free key at rss2json.com and paste it into RSS2JSON_KEY below for reliable refreshes.
   India tab: no single regional outlet publishes a reliable, stable RSS feed for Telangana specifically, so this uses Google News' topic and keyword-search RSS (India edition) instead — bylines are parsed out of each headline's "– Publisher" suffix.
   Sports Calendar: static reference data (season start/end dates), not a live feed — verified as of Sept 2026. A couple of dates (Champions League final, La Liga end date, The Open Championship) had conflicting or unconfirmed reporting at write time and are flagged inline. Refresh this list yourself as seasons roll over.
-  Government tab: official U.S. sources only. This calls the Federal Register's actual documented JSON API (federalregister.gov/api/v1/documents.json) directly — no RSS, no proxy — which is the real, confirmed public interface, unlike an earlier RSS URL I gave you that turned out to be wrong. I couldn't find a verified official FDA newsroom RSS URL (their feed structure has moved over the years and I don't have a confirmed current address), so I dropped those two cards rather than guess again — if you find FDA's current feed URL on their site, send it and I'll add it back. The Financial Markets card originally filtered to three agencies (SEC/Treasury/CFTC) at once, which the API most likely treats as "must match all three simultaneously" rather than "any of the three" — that's almost certainly why it came back empty, so it's now an unfiltered term search across all agencies instead, matching the pattern that already works reliably for the other cards.
+  Government tab: official U.S. sources only. This calls the Federal Register's actual documented JSON API (federalregister.gov/api/v1/documents.json) directly — no RSS, no proxy — which is the real, confirmed public interface, unlike an earlier RSS URL I gave you that turned out to be wrong. I couldn't find a verified official FDA newsroom RSS URL (their feed structure has moved over the years and I don't have a confirmed current address), so I dropped those two cards rather than guess again — if you find FDA's current feed URL on their site, send it and I'll add it back. The Financial Markets card originally filtered to three agencies (SEC/Treasury/CFTC) at once, which the API most likely treats as "must match all three simultaneously" rather than "any of the three" — that's almost certainly why it came back empty, so it's now an unfiltered term search across all agencies instead, matching the pattern that already works reliably for the other cards.  Congress tab: official U.S. source — the Congress.gov API (api.congress.gov), maintained by the Library of Congress. Requires a free key (CONGRESS_API_KEY below); sign up at api.congress.gov/sign-up. Grouped by state, Senators listed before House members within each state, district shown for House seats. I have not independently field-tested this API's exact response shape the way I have the others in this file — the parsing is written defensively (multiple fallback field names) but if a card looks wrong once you add your key, send a screenshot and I'll correct the field mapping against real data.
 </footer>
 
 <script>
 const RSS2JSON_KEY = "db9qkqevgkt7nkruiu50vhifewsjodplgbloud07"; // rss2json.com dedicated quota
 const ALPACA_KEY_ID = "PKW5P5SPUJJZVXI5YDQYWJC7JS";
 const ALPACA_SECRET = "CZTsLJhfsRAB6rpBemK1mWmUbYdNLJssKJ5F5FbaogzX";
+
+// Free key from api.congress.gov (Library of Congress' official API) — sign up at
+// https://api.congress.gov/sign-up, then paste the key here.
+const CONGRESS_API_KEY = "LjB3ydTfgyfnZAFQSyiShffft16pPBEYmrQcOsez";
 
 function fmtTime(){
   const d = new Date();
@@ -887,11 +911,85 @@ function renderCalendar(){
   renderCalendarGroup('calendar-world', CALENDAR_WORLD);
 }
 
+// ---------- CONGRESS (official Congress.gov API — Library of Congress) ----------
+function partyTag(partyName){
+  const p = (partyName || '').toLowerCase();
+  if(p.startsWith('rep')) return {code:'R', cls:'r'};
+  if(p.startsWith('dem')) return {code:'D', cls:'d'};
+  return {code:'I', cls:'i'};
+}
+
+async function fetchAllMembers(){
+  const all = [];
+  let offset = 0;
+  const limit = 250;
+  for(let i = 0; i < 4; i++){ // hard cap of 4 pages (1000 members) as a safety limit
+    const url = `https://api.congress.gov/v3/member?currentMember=true&limit=${limit}&offset=${offset}&format=json&api_key=${CONGRESS_API_KEY}`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    const batch = data.members || [];
+    all.push(...batch);
+    if(batch.length < limit) break;
+    offset += limit;
+  }
+  return all;
+}
+
+async function loadCongress(){
+  const status = document.getElementById('congress-status');
+  const grid = document.getElementById('congress-grid');
+  if(!CONGRESS_API_KEY){
+    status.textContent = 'Add a free api.congress.gov key to CONGRESS_API_KEY to load current members.';
+    grid.innerHTML = '';
+    return;
+  }
+  status.textContent = 'Loading current members of Congress…';
+  grid.innerHTML = '';
+  try{
+    const members = await fetchAllMembers();
+    const byState = {};
+    members.forEach(m=>{
+      const stateName = m.state || 'Unknown';
+      const latestTerm = (m.terms?.item || m.terms || []).slice(-1)[0] || {};
+      const isHouse = (latestTerm.chamber || '').toLowerCase().includes('house') || (m.district !== undefined && m.district !== null);
+      const seat = isHouse ? `District ${m.district ?? '?'}` : 'Senator';
+      const tag = partyTag(m.partyName);
+      if(!byState[stateName]) byState[stateName] = [];
+      byState[stateName].push({name: m.name, seat, isHouse, tag});
+    });
+    const states = Object.keys(byState).sort();
+    if(states.length === 0){
+      status.textContent = 'No members returned — check the API key or try again.';
+      return;
+    }
+    status.textContent = `${members.length} current members, grouped by state.`;
+    states.forEach(stateName=>{
+      const list = byState[stateName].sort((a,b)=> (a.isHouse === b.isHouse) ? 0 : (a.isHouse ? 1 : -1));
+      const body = document.createElement('div');
+      list.forEach(m=>{
+        const row = document.createElement('div');
+        row.className = 'member-row';
+        row.innerHTML = `
+          <span class="party-tag ${m.tag.cls}">${m.tag.code}</span>
+          <span class="member-name">${m.name}</span>
+          <span class="member-seat">(${m.seat})</span>
+        `;
+        body.appendChild(row);
+      });
+      grid.appendChild(makeCard(stateName, body, {}));
+    });
+  }catch(e){
+    status.textContent = 'Unable to load Congress data right now (check the API key, or Congress.gov may be down).';
+  }
+}
+
 // ---------- ORCHESTRATION ----------
 loadSports();
 loadMarkets();
 loadAllNews();
 renderCalendar();
+loadCongress();
 setInterval(loadSports, 45_000);
 setInterval(loadMarkets, 30_000);
 setInterval(loadAllNews, 10 * 60_000);
