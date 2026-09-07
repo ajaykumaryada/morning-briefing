@@ -139,6 +139,7 @@
     font-size:11px; color:var(--ink-dim); min-width:64px; text-align:right; font-family:var(--mono);
   }
   .row .state.live{color:var(--up); font-weight:600;}
+  .game-meta{font-size:11px; color:var(--ink-dim); line-height:1.5; margin-top:4px;}
   .price-row .delta.up{color:var(--up);}
   .price-row .delta.down{color:var(--down);}
 
@@ -264,7 +265,7 @@
 </main>
 
 <footer>
-  Sports: ESPN's public scoreboard endpoints (no key), refreshed every 45s. Cricket (Test/IPL) links out to ESPNcricinfo — ESPN's cricket API needs a live series ID rather than a fixed slug.
+  Sports: ESPN's public scoreboard endpoints (no key), refreshed every 45s. Cricket (Test/IPL) links out to ESPNcricinfo — ESPN's cricket API needs a live series ID rather than a fixed slug. Goal scorers (soccer) and top-performer lines (all sports) are best-effort — ESPN's scoreboard includes this data inconsistently by sport and by game, so it's shown when present and silently omitted when not, rather than guessed.
   Markets: CoinGecko for crypto (no key, ~30s). US indices (S&P 500 / Nasdaq 100 / Dow 30) shown via SPY/QQQ/DIA proxies through Alpaca's Market Data API (IEX feed), authenticated with a paper-trading account key — no real funds are reachable through this key even if exposed.
   News: RSS via rss2json's public endpoint (10-min refresh), which rate-limits unauthenticated traffic — get a free key at rss2json.com and paste it into RSS2JSON_KEY below for reliable refreshes.
   India tab: no single regional outlet publishes a reliable, stable RSS feed for Telangana specifically, so this uses Google News' topic and keyword-search RSS (India edition) instead — bylines are parsed out of each headline's "– Publisher" suffix.
@@ -396,13 +397,42 @@ async function fetchSport(sport){
       const home = competitors.find(c=>c.homeAway==='home');
       const away = competitors.find(c=>c.homeAway==='away');
       const state = ev.status?.type?.state;
+
+      // Goal scorers, where ESPN provides them (mainly soccer) — best-effort, hidden if absent.
+      let goals = null;
+      const details = comp?.details || [];
+      const goalEvents = details.filter(d => (d.type?.text || d.type?.abbreviation || '').toLowerCase().includes('goal'));
+      if(goalEvents.length > 0){
+        goals = goalEvents.map(g => {
+          const scorer = g.athletesInvolved?.[0]?.displayName || g.athletesInvolved?.[0]?.shortName || '';
+          const clock = g.clock?.displayValue || '';
+          const isHome = g.team?.id === home?.team?.id;
+          return {scorer, clock, isHome};
+        }).filter(g => g.scorer);
+      }
+
+      // Top performers, where ESPN provides them (varies by sport — batting/pitching leaders for
+      // MLB, passing/points leaders for NFL/NBA, etc.) — best-effort, hidden if absent.
+      let leaders = null;
+      const leaderLines = [];
+      [home, away].forEach(side=>{
+        (side?.leaders || []).slice(0,1).forEach(cat=>{
+          const top = cat.leaders?.[0];
+          if(top?.athlete?.displayName){
+            leaderLines.push(`${cat.shortDisplayName || cat.displayName || ''}: ${top.athlete.displayName} (${top.displayValue})`);
+          }
+        });
+      });
+      if(leaderLines.length > 0) leaders = leaderLines;
+
       return {
         home: home?.team?.displayName || home?.team?.shortDisplayName || home?.team?.abbreviation || '?',
         away: away?.team?.displayName || away?.team?.shortDisplayName || away?.team?.abbreviation || '?',
         homeScore: home?.score ?? '',
         awayScore: away?.score ?? '',
         live: state === 'in',
-        detail: ev.status?.type?.shortDetail || ''
+        detail: ev.status?.type?.shortDetail || '',
+        goals, leaders
       };
     });
     return {label: sport.label, rows};
@@ -426,12 +456,26 @@ function buildSportBody(rows){
     if(g.live) live = true;
     const row = document.createElement('div');
     row.className = 'row';
+    row.style.flexDirection = 'column';
+    row.style.alignItems = 'stretch';
+    let metaHtml = '';
+    if(g.goals && g.goals.length){
+      const awayGoals = g.goals.filter(x=>!x.isHome).map(x=>`${x.scorer} ${x.clock}`).join(', ');
+      const homeGoals = g.goals.filter(x=>x.isHome).map(x=>`${x.scorer} ${x.clock}`).join(', ');
+      metaHtml += `<div class="game-meta">⚽ ${awayGoals ? g.away + ': ' + awayGoals : ''}${awayGoals && homeGoals ? ' · ' : ''}${homeGoals ? g.home + ': ' + homeGoals : ''}</div>`;
+    }
+    if(g.leaders && g.leaders.length){
+      metaHtml += `<div class="game-meta">${g.leaders.join(' · ')}</div>`;
+    }
     row.innerHTML = `
-      <div class="who">
-        <div class="team"><span>${g.away}</span><span class="score">${g.awayScore}</span></div>
-        <div class="team"><span>${g.home}</span><span class="score">${g.homeScore}</span></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        <div class="who">
+          <div class="team"><span>${g.away}</span><span class="score">${g.awayScore}</span></div>
+          <div class="team"><span>${g.home}</span><span class="score">${g.homeScore}</span></div>
+        </div>
+        <div class="state ${g.live ? 'live' : ''}">${g.detail}</div>
       </div>
-      <div class="state ${g.live ? 'live' : ''}">${g.detail}</div>
+      ${metaHtml}
     `;
     body.appendChild(row);
   });
